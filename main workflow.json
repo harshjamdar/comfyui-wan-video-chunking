@@ -459,14 +459,14 @@
     },
     {
       "id": 14,
-      "type": "VAEDecode",
+      "type": "WanChunkedVAEDecode",
       "pos": [
         750,
         -100
       ],
       "size": [
-        200,
-        100
+        260,
+        140
       ],
       "flags": {},
       "order": 14,
@@ -493,9 +493,11 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "VAEDecode"
+        "Node name for S&R": "WanChunkedVAEDecode"
       },
-      "widgets_values": []
+      "widgets_values": [
+        16
+      ]
     },
     {
       "id": 15,
@@ -530,14 +532,14 @@
     },
     {
       "id": 16,
-      "type": "ImageUpscaleWithModel",
+      "type": "WanChunkedImageUpscaleWithModel",
       "pos": [
         1050,
         -100
       ],
       "size": [
-        250,
-        120
+        300,
+        150
       ],
       "flags": {},
       "order": 15,
@@ -564,20 +566,22 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "ImageUpscaleWithModel"
+        "Node name for S&R": "WanChunkedImageUpscaleWithModel"
       },
-      "widgets_values": []
+      "widgets_values": [
+        8
+      ]
     },
     {
       "id": 17,
-      "type": "ImageScale",
+      "type": "WanChunkedImageScale",
       "pos": [
         1350,
         -100
       ],
       "size": [
-        250,
-        150
+        300,
+        190
       ],
       "flags": {},
       "order": 16,
@@ -599,9 +603,10 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "ImageScale"
+        "Node name for S&R": "WanChunkedImageScale"
       },
       "widgets_values": [
+        8,
         "lanczos",
         1080,
         1920,

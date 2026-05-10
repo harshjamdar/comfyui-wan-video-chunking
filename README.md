@@ -9,6 +9,16 @@ main workflow.json
 
 The workflow replaces the normal `KSampler` with `Wan Latent Chunk Sampler`. The node samples video latents in smaller time chunks so longer videos do not go through one huge sampler pass.
 
+The workflow also replaces full-batch decode/upscale nodes with chunked versions:
+
+```text
+Wan Chunked VAE Decode
+Wan Chunked Image Upscale
+Wan Chunked Image Scale
+```
+
+These reduce peak VRAM/RAM during VAE decode and upscaling.
+
 ## Install
 
 Copy the custom node into ComfyUI:
@@ -35,6 +45,9 @@ Default chunk settings:
 ```text
 chunk_len: 16
 overlap_len: 0
+decode_chunk_frames: 16
+upscale_chunk_frames: 8
+scale_chunk_frames: 8
 ```
 
 The sampler widget order is intentionally plain and stable:
@@ -69,6 +82,10 @@ UPLOAD MOTION VIDEO    -> input video upload/select
 The filenames in the workflow are only defaults. For every run, upload/select the new reference image in `LoadImage` and the new video in `VHS_LoadVideo`.
 
 The reference image node was moved away from the large video loader node so it is visible on the canvas.
+
+## Remaining Limit
+
+This workflow still creates the full Wan latent before decode. The sampling, decode, model upscale, and resize steps are chunked, but `VHS_LoadVideo`, pose detection, and `WanAnimateToVideo` still operate on the selected video length.
 
 ## Important
 
