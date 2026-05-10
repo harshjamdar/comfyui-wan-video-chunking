@@ -3,6 +3,15 @@ import copy
 import torch
 
 
+def _get_builtin_node(class_type):
+    import nodes
+
+    try:
+        return nodes.NODE_CLASS_MAPPINGS[class_type]
+    except KeyError as exc:
+        raise RuntimeError(f"Built-in ComfyUI node not found: {class_type}") from exc
+
+
 def _slice_latent_frames(latent, start, end):
     chunk = copy.copy(latent)
     samples = latent["samples"]
@@ -206,7 +215,7 @@ class WanChunkedVAEDecode:
     CATEGORY = "latent/video"
 
     def decode(self, samples, vae, decode_chunk_frames):
-        from nodes import VAEDecode
+        VAEDecode = _get_builtin_node("VAEDecode")
 
         latent_samples = samples["samples"]
         if latent_samples.ndim != 5:
@@ -240,7 +249,7 @@ class WanChunkedImageUpscaleWithModel:
     CATEGORY = "image/upscaling"
 
     def upscale(self, upscale_model, image, upscale_chunk_frames):
-        from nodes import ImageUpscaleWithModel
+        ImageUpscaleWithModel = _get_builtin_node("ImageUpscaleWithModel")
 
         upscaled_chunks = []
         upscaler = ImageUpscaleWithModel()
@@ -256,7 +265,7 @@ class WanChunkedImageUpscaleWithModel:
 class WanChunkedImageScale:
     @classmethod
     def INPUT_TYPES(cls):
-        from nodes import ImageScale
+        ImageScale = _get_builtin_node("ImageScale")
 
         return {
             "required": {
@@ -274,7 +283,7 @@ class WanChunkedImageScale:
     CATEGORY = "image/upscaling"
 
     def upscale(self, image, scale_chunk_frames, upscale_method, width, height, crop):
-        from nodes import ImageScale
+        ImageScale = _get_builtin_node("ImageScale")
 
         scaled_chunks = []
         scaler = ImageScale()
