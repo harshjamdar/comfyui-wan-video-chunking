@@ -14,7 +14,7 @@ class ChunkedWanKSampler:
                 "positive": ("CONDITIONING",),
                 "negative": ("CONDITIONING",),
                 "latent_image": ("LATENT",),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                "noise_seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
                 "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
                 "cfg": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0, "step": 0.1, "round": 0.01}),
                 "sampler_name": (comfy.samplers.KSampler.SAMPLERS,),
@@ -32,7 +32,7 @@ class ChunkedWanKSampler:
     def _run_ksampler(
         self,
         model,
-        seed,
+        noise_seed,
         steps,
         cfg,
         sampler_name,
@@ -75,7 +75,7 @@ class ChunkedWanKSampler:
         positive,
         negative,
         latent_image,
-        seed,
+        noise_seed,
         steps,
         cfg,
         sampler_name,
@@ -89,7 +89,7 @@ class ChunkedWanKSampler:
             return (
                 self._run_ksampler(
                     model,
-                    seed,
+                    noise_seed,
                     steps,
                     cfg,
                     sampler_name,
@@ -109,7 +109,7 @@ class ChunkedWanKSampler:
             return (
                 self._run_ksampler(
                     model,
-                    seed,
+                    noise_seed,
                     steps,
                     cfg,
                     sampler_name,
@@ -132,7 +132,7 @@ class ChunkedWanKSampler:
 
             result = self._run_ksampler(
                 model,
-                seed + chunk_index,
+                noise_seed + chunk_index,
                 steps,
                 cfg,
                 sampler_name,

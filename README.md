@@ -40,7 +40,7 @@ overlap_latent_frames: 0
 The sampler widget order is intentionally plain and stable:
 
 ```text
-seed
+noise_seed
 steps
 cfg
 sampler_name
