@@ -27,6 +27,9 @@ Default chunk size:
 ```text
 ComfyUI-VideoChunking/          Custom ComfyUI node package
 wan_chunked_master_workflow.json Master workflow with the chunk runner node
+wan_chunked_master_workflow_api.json API prompt for deployment
+wan_chunked_master_payload.json API /prompt payload for direct curl runs
+workflows/gemini_final_1_api.json Full Wan worker pipeline in API format
 gemini final 1.json              Current visual Wan baseline workflow
 ```
 
@@ -59,6 +62,10 @@ Install the custom nodes:
 ```bash
 cp -r ComfyUI-VideoChunking "$COMFYUI_DIR/custom_nodes/"
 cp wan_chunked_master_workflow.json "$COMFYUI_DIR/"
+cp wan_chunked_master_workflow_api.json "$COMFYUI_DIR/"
+cp wan_chunked_master_payload.json "$COMFYUI_DIR/"
+mkdir -p "$COMFYUI_DIR/workflows"
+cp workflows/gemini_final_1_api.json "$COMFYUI_DIR/workflows/"
 cp "gemini final 1.json" "$COMFYUI_DIR/"
 ```
 
@@ -99,13 +106,102 @@ git pull
 rm -rf "$COMFYUI_DIR/custom_nodes/ComfyUI-VideoChunking"
 cp -r ComfyUI-VideoChunking "$COMFYUI_DIR/custom_nodes/"
 cp wan_chunked_master_workflow.json "$COMFYUI_DIR/"
+cp wan_chunked_master_workflow_api.json "$COMFYUI_DIR/"
+cp wan_chunked_master_payload.json "$COMFYUI_DIR/"
+mkdir -p "$COMFYUI_DIR/workflows"
+cp workflows/gemini_final_1_api.json "$COMFYUI_DIR/workflows/"
 ```
 
 Restart ComfyUI.
 
-## Required API Workflow Export
+## Deployment-Ready JSON Files
 
-The master node cannot use the visual workflow JSON directly. It needs ComfyUI API-format JSON.
+There are two workflow JSONs for deployment:
+
+```text
+workflows/gemini_final_1_api.json
+```
+
+This is the full Wan Animate worker pipeline converted to ComfyUI API format. It contains the model loaders, video loader, pose detection, WanAnimateToVideo, sampler, VAE decode, upscale, CreateVideo, and SaveVideo nodes.
+
+```text
+wan_chunked_master_workflow_api.json
+```
+
+This is the API-format master prompt. It contains the `WanChunkedWorkflowRunner`, which loads `workflows/gemini_final_1_api.json`, runs it once per chunk, then stitches all chunk videos into the final MP4.
+
+```text
+wan_chunked_master_payload.json
+```
+
+This wraps the master prompt as `{"prompt": ...}` so it can be posted directly to ComfyUI.
+
+Recommended production layout:
+
+```text
+Controller ComfyUI, port 8188 -> receives your deployment API call
+Worker ComfyUI, port 8190     -> receives each Wan chunk job
+```
+
+Start them:
+
+```bash
+cd "$COMFYUI_DIR"
+python main.py --listen 0.0.0.0 --port 8188
+```
+
+In a second terminal:
+
+```bash
+cd "$COMFYUI_DIR"
+python main.py --listen 127.0.0.1 --port 8190
+```
+
+Queue the complete chunked pipeline with one command:
+
+```bash
+cd "$COMFYUI_DIR"
+curl -sS -X POST \
+  -H "Content-Type: application/json" \
+  --data-binary @wan_chunked_master_payload.json \
+  http://127.0.0.1:8188/prompt
+```
+
+Or queue it with Python:
+
+```bash
+cd "$COMFYUI_DIR"
+python - <<'PY'
+import json
+import urllib.request
+
+prompt = json.load(open("wan_chunked_master_workflow_api.json", "r", encoding="utf-8"))
+payload = json.dumps({"prompt": prompt}).encode("utf-8")
+req = urllib.request.Request(
+    "http://127.0.0.1:8188/prompt",
+    data=payload,
+    headers={"Content-Type": "application/json"},
+)
+print(urllib.request.urlopen(req).read().decode("utf-8"))
+PY
+```
+
+Before running, put your source files here or update the paths in `wan_chunked_master_workflow_api.json`:
+
+```text
+$COMFYUI_DIR/input/test.mp4
+$COMFYUI_DIR/input/ChatGPT Image May 10, 2026, 05_20_13 PM.png
+```
+
+Final output:
+
+```text
+$COMFYUI_DIR/output/wan22_chunked_final.mp4
+```
+
+## Optional API Workflow Export
+
+The repo already includes `workflows/gemini_final_1_api.json`. Re-export only if you change the visual Wan pipeline in ComfyUI.
 
 In your browser ComfyUI:
 
@@ -158,7 +254,7 @@ Set these fields:
 
 ```text
 workflow_api_json_path: /home/YOUR_USER/ComfyUI/workflows/gemini_final_1_api.json
-comfyui_api_url: http://127.0.0.1:8188
+comfyui_api_url: http://127.0.0.1:8190
 video_path: /home/YOUR_USER/ComfyUI/input/test.mp4
 output_dir: /home/YOUR_USER/ComfyUI/output
 final_output_path: /home/YOUR_USER/ComfyUI/output/wan22_chunked_final.mp4

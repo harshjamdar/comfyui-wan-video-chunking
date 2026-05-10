@@ -357,7 +357,7 @@ class WanChunkedWorkflowRunner:
         return {
             "required": {
                 "workflow_api_json_path": ("STRING", {"default": "workflows/gemini_final_1_api.json"}),
-                "comfyui_api_url": ("STRING", {"default": "http://127.0.0.1:8188"}),
+                "comfyui_api_url": ("STRING", {"default": "http://127.0.0.1:8190"}),
                 "video_path": ("STRING", {"default": "input/test.mp4"}),
                 "output_dir": ("STRING", {"default": "output"}),
                 "final_output_path": ("STRING", {"default": "output/wan22_chunked_final.mp4"}),

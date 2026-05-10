@@ -31,7 +31,7 @@
       },
       "widgets_values": [
         "workflows/gemini_final_1_api.json",
-        "http://127.0.0.1:8188",
+        "http://127.0.0.1:8190",
         "input/test.mp4",
         "output",
         "output/wan22_chunked_final.mp4",
