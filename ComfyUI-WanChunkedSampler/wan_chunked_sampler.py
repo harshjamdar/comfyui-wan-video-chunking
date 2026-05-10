@@ -173,7 +173,7 @@ class WanLatentChunkSampler:
 
             result = self._run_ksampler(
                 model,
-                base_noise_seed + chunk_index,
+                base_noise_seed,
                 sample_steps,
                 guidance_cfg,
                 sampler,
