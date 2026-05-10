@@ -4,10 +4,17 @@ Custom nodes for rendering video in fixed-size chunks, for example 2 seconds at 
 
 ## Install On The Droplet
 
+Recommended full install commands are in the repository root `README.md`.
+
 Copy this folder into your ComfyUI install:
 
 ```bash
-cp -r ComfyUI-VideoChunking /path/to/ComfyUI/custom_nodes/
+export COMFYUI_DIR="$HOME/ComfyUI"
+cd "$HOME"
+git clone https://github.com/harshjamdar/comfyui-wan-video-chunking.git
+cd comfyui-wan-video-chunking
+cp -r ComfyUI-VideoChunking "$COMFYUI_DIR/custom_nodes/"
+cp wan_chunked_master_workflow.json "$COMFYUI_DIR/"
 ```
 
 Restart ComfyUI.
@@ -15,6 +22,7 @@ Restart ComfyUI.
 If OpenCV is missing in the ComfyUI Python environment:
 
 ```bash
+cd "$COMFYUI_DIR"
 pip install opencv-python
 ```
 
