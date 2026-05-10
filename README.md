@@ -62,11 +62,13 @@ overlap_len: 2
 The workflow is not hardcoded to one image or video. It has normal Comfy input nodes:
 
 ```text
-LoadImage       -> reference image upload/select
-VHS_LoadVideo   -> input video upload/select
+UPLOAD REFERENCE IMAGE -> reference image upload/select
+UPLOAD MOTION VIDEO    -> input video upload/select
 ```
 
 The filenames in the workflow are only defaults. For every run, upload/select the new reference image in `LoadImage` and the new video in `VHS_LoadVideo`.
+
+The reference image node was moved away from the large video loader node so it is visible on the canvas.
 
 ## Important
 

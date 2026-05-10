@@ -8,8 +8,8 @@
       "id": 2,
       "type": "LoadImage",
       "pos": [
-        -1200,
-        450
+        -1650,
+        -320
       ],
       "size": [
         280,
@@ -34,8 +34,9 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "LoadImage"
+        "Node name for S&R": "UPLOAD_REFERENCE_IMAGE"
       },
+      "title": "UPLOAD REFERENCE IMAGE",
       "widgets_values": [
         "ChatGPT Image May 10, 2026, 05_20_13 PM.png",
         "image"
@@ -813,7 +814,7 @@
       "id": 1,
       "type": "VHS_LoadVideo",
       "pos": [
-        -1200,
+        -1650,
         100
       ],
       "size": [
@@ -866,8 +867,9 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "VHS_LoadVideo"
+        "Node name for S&R": "UPLOAD_MOTION_VIDEO"
       },
+      "title": "UPLOAD MOTION VIDEO",
       "widgets_values": {
         "video": "test.mp4",
         "force_rate": 30,

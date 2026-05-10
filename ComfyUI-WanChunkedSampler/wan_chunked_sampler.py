@@ -69,6 +69,26 @@ class WanLatentChunkSampler:
 
         return chunk
 
+    def _slice_value(self, value, start, end, total_frames):
+        if isinstance(value, torch.Tensor):
+            if value.ndim >= 3 and value.shape[2] == total_frames:
+                return value[:, :, start:end].contiguous()
+            return value
+
+        if isinstance(value, dict):
+            return {key: self._slice_value(item, start, end, total_frames) for key, item in value.items()}
+
+        if isinstance(value, list):
+            return [self._slice_value(item, start, end, total_frames) for item in value]
+
+        if isinstance(value, tuple):
+            return tuple(self._slice_value(item, start, end, total_frames) for item in value)
+
+        return value
+
+    def _slice_conditioning(self, conditioning, start, end, total_frames):
+        return self._slice_value(conditioning, start, end, total_frames)
+
     def sample(
         self,
         model,
@@ -129,6 +149,8 @@ class WanLatentChunkSampler:
         while start < total_frames:
             end = min(total_frames, start + chunk_size)
             latent_chunk = self._slice_latent(latent_image, start, end)
+            positive_chunk = self._slice_conditioning(positive, start, end, total_frames)
+            negative_chunk = self._slice_conditioning(negative, start, end, total_frames)
 
             result = self._run_ksampler(
                 model,
@@ -137,8 +159,8 @@ class WanLatentChunkSampler:
                 guidance_cfg,
                 sampler,
                 schedule,
-                positive,
-                negative,
+                positive_chunk,
+                negative_chunk,
                 latent_chunk,
                 noise_denoise,
             )
