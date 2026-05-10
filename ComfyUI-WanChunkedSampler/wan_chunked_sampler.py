@@ -85,6 +85,55 @@ class WanLatentChunkSampler:
             denoise,
         )[0]
 
+    def _run_ksampler_with_noise(
+        self,
+        model,
+        noise,
+        steps,
+        cfg,
+        sampler_name,
+        scheduler,
+        positive,
+        negative,
+        latent_image,
+        denoise,
+        seed,
+    ):
+        import comfy.sample
+        import comfy.utils
+        import latent_preview
+
+        latent_samples = latent_image["samples"]
+        latent_samples = comfy.sample.fix_empty_latent_channels(model, latent_samples)
+        noise_mask = latent_image.get("noise_mask")
+        callback = latent_preview.prepare_callback(model, steps)
+        disable_pbar = not comfy.utils.PROGRESS_BAR_ENABLED
+
+        sampled = comfy.sample.sample(
+            model,
+            noise,
+            steps,
+            cfg,
+            sampler_name,
+            scheduler,
+            positive,
+            negative,
+            latent_samples,
+            denoise=denoise,
+            disable_noise=False,
+            start_step=None,
+            last_step=None,
+            force_full_denoise=True,
+            noise_mask=noise_mask,
+            callback=callback,
+            disable_pbar=disable_pbar,
+            seed=seed,
+        )
+
+        output = copy.copy(latent_image)
+        output["samples"] = sampled
+        return output
+
     def _slice_latent(self, latent, start, end):
         return _slice_latent_frames(latent, start, end)
 
@@ -164,16 +213,22 @@ class WanLatentChunkSampler:
         pieces = []
         start = 0
         chunk_index = 0
+        import comfy.sample
+
+        fixed_full_samples = comfy.sample.fix_empty_latent_channels(model, samples)
+        batch_inds = latent_image.get("batch_index")
+        full_noise = comfy.sample.prepare_noise(fixed_full_samples, base_noise_seed, batch_inds)
 
         while start < total_frames:
             end = min(total_frames, start + chunk_size)
             latent_chunk = self._slice_latent(latent_image, start, end)
             positive_chunk = self._slice_conditioning(positive, start, end, total_frames)
             negative_chunk = self._slice_conditioning(negative, start, end, total_frames)
+            noise_chunk = full_noise[:, :, start:end].contiguous()
 
-            result = self._run_ksampler(
+            result = self._run_ksampler_with_noise(
                 model,
-                base_noise_seed,
+                noise_chunk,
                 sample_steps,
                 guidance_cfg,
                 sampler,
@@ -182,6 +237,7 @@ class WanLatentChunkSampler:
                 negative_chunk,
                 latent_chunk,
                 noise_denoise,
+                base_noise_seed,
             )
 
             result_samples = result["samples"]
