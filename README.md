@@ -7,7 +7,7 @@ ComfyUI-WanChunkedSampler/
 main workflow.json
 ```
 
-The workflow replaces the normal `KSampler` with `Chunked Wan KSampler`. The node samples video latents in smaller time chunks so longer videos do not go through one huge sampler pass.
+The workflow replaces the normal `KSampler` with `Wan Latent Chunk Sampler`. The node samples video latents in smaller time chunks so longer videos do not go through one huge sampler pass.
 
 ## Install
 
@@ -33,29 +33,40 @@ The sampler node is already connected.
 Default chunk settings:
 
 ```text
-latent_chunk_frames: 16
-overlap_latent_frames: 0
+chunk_len: 16
+overlap_len: 0
 ```
 
 The sampler widget order is intentionally plain and stable:
 
 ```text
-noise_seed
-steps
-cfg
-sampler_name
-scheduler
-denoise
-latent_chunk_frames
-overlap_latent_frames
+base_noise_seed
+sample_steps
+guidance_cfg
+sampler
+schedule
+noise_denoise
+chunk_len
+overlap_len
 ```
 
 If the output has visible temporal cuts, try:
 
 ```text
-latent_chunk_frames: 12
-overlap_latent_frames: 2
+chunk_len: 12
+overlap_len: 2
 ```
+
+## User Inputs
+
+The workflow is not hardcoded to one image or video. It has normal Comfy input nodes:
+
+```text
+LoadImage       -> reference image upload/select
+VHS_LoadVideo   -> input video upload/select
+```
+
+The filenames in the workflow are only defaults. For every run, upload/select the new reference image in `LoadImage` and the new video in `VHS_LoadVideo`.
 
 ## Important
 

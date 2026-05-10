@@ -399,7 +399,7 @@
     },
     {
       "id": 13,
-      "type": "ChunkedWanKSampler",
+      "type": "WanLatentChunkSampler",
       "pos": [
         400,
         -100
@@ -443,7 +443,7 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "ChunkedWanKSampler"
+        "Node name for S&R": "WanLatentChunkSampler"
       },
       "widgets_values": [
         963067643049281,

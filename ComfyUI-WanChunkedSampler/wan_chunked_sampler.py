@@ -3,7 +3,7 @@ import copy
 import torch
 
 
-class ChunkedWanKSampler:
+class WanLatentChunkSampler:
     @classmethod
     def INPUT_TYPES(cls):
         import comfy.samplers
@@ -14,14 +14,14 @@ class ChunkedWanKSampler:
                 "positive": ("CONDITIONING",),
                 "negative": ("CONDITIONING",),
                 "latent_image": ("LATENT",),
-                "noise_seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
-                "cfg": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0, "step": 0.1, "round": 0.01}),
-                "sampler_name": (comfy.samplers.KSampler.SAMPLERS,),
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS,),
-                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
-                "latent_chunk_frames": ("INT", {"default": 16, "min": 1, "max": 512}),
-                "overlap_latent_frames": ("INT", {"default": 0, "min": 0, "max": 128}),
+                "base_noise_seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                "sample_steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
+                "guidance_cfg": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0, "step": 0.1, "round": 0.01}),
+                "sampler": (comfy.samplers.KSampler.SAMPLERS,),
+                "schedule": (comfy.samplers.KSampler.SCHEDULERS,),
+                "noise_denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "chunk_len": ("INT", {"default": 16, "min": 1, "max": 512}),
+                "overlap_len": ("INT", {"default": 0, "min": 0, "max": 128}),
             }
         }
 
@@ -46,7 +46,7 @@ class ChunkedWanKSampler:
 
         return KSampler().sample(
             model,
-            seed,
+            noise_seed,
             steps,
             cfg,
             sampler_name,
@@ -75,49 +75,49 @@ class ChunkedWanKSampler:
         positive,
         negative,
         latent_image,
-        noise_seed,
-        steps,
-        cfg,
-        sampler_name,
-        scheduler,
-        denoise,
-        latent_chunk_frames,
-        overlap_latent_frames,
+        base_noise_seed,
+        sample_steps,
+        guidance_cfg,
+        sampler,
+        schedule,
+        noise_denoise,
+        chunk_len,
+        overlap_len,
     ):
         samples = latent_image["samples"]
         if samples.ndim != 5:
             return (
                 self._run_ksampler(
                     model,
-                    noise_seed,
-                    steps,
-                    cfg,
-                    sampler_name,
-                    scheduler,
+                    base_noise_seed,
+                    sample_steps,
+                    guidance_cfg,
+                    sampler,
+                    schedule,
                     positive,
                     negative,
                     latent_image,
-                    denoise,
+                    noise_denoise,
                 ),
             )
 
         total_frames = samples.shape[2]
-        chunk_size = max(1, int(latent_chunk_frames))
-        overlap = max(0, min(int(overlap_latent_frames), chunk_size - 1))
+        chunk_size = max(1, int(chunk_len))
+        overlap = max(0, min(int(overlap_len), chunk_size - 1))
 
         if total_frames <= chunk_size:
             return (
                 self._run_ksampler(
                     model,
-                    noise_seed,
-                    steps,
-                    cfg,
-                    sampler_name,
-                    scheduler,
+                    base_noise_seed,
+                    sample_steps,
+                    guidance_cfg,
+                    sampler,
+                    schedule,
                     positive,
                     negative,
                     latent_image,
-                    denoise,
+                    noise_denoise,
                 ),
             )
 
@@ -132,15 +132,15 @@ class ChunkedWanKSampler:
 
             result = self._run_ksampler(
                 model,
-                noise_seed + chunk_index,
-                steps,
-                cfg,
-                sampler_name,
-                scheduler,
+                base_noise_seed + chunk_index,
+                sample_steps,
+                guidance_cfg,
+                sampler,
+                schedule,
                 positive,
                 negative,
                 latent_chunk,
-                denoise,
+                noise_denoise,
             )
 
             result_samples = result["samples"]
@@ -159,9 +159,9 @@ class ChunkedWanKSampler:
 
 
 NODE_CLASS_MAPPINGS = {
-    "ChunkedWanKSampler": ChunkedWanKSampler,
+    "WanLatentChunkSampler": WanLatentChunkSampler,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "ChunkedWanKSampler": "Chunked Wan KSampler",
+    "WanLatentChunkSampler": "Wan Latent Chunk Sampler",
 }
