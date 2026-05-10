@@ -334,9 +334,7 @@
         {
           "name": "key_frame_body_points",
           "type": "STRING",
-          "links": [
-            25
-          ]
+          "links": null
         },
         {
           "name": "bboxes",
@@ -401,14 +399,14 @@
     },
     {
       "id": 13,
-      "type": "KSampler",
+      "type": "ChunkedWanKSampler",
       "pos": [
         400,
         -100
       ],
       "size": [
-        300,
-        262
+        330,
+        330
       ],
       "flags": {},
       "order": 13,
@@ -445,7 +443,7 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "KSampler"
+        "Node name for S&R": "ChunkedWanKSampler"
       },
       "widgets_values": [
         963067643049281,
@@ -454,7 +452,9 @@
         1,
         "euler",
         "simple",
-        1
+        1,
+        16,
+        0
       ]
     },
     {
@@ -844,9 +844,7 @@
         {
           "name": "frame_count",
           "type": "INT",
-          "links": [
-            11
-          ]
+          "links": null
         },
         {
           "name": "audio",
@@ -899,14 +897,6 @@
       10,
       1,
       "IMAGE"
-    ],
-    [
-      11,
-      1,
-      1,
-      12,
-      2,
-      "INT"
     ],
     [
       12,
@@ -1011,14 +1001,6 @@
       12,
       5,
       "IMAGE"
-    ],
-    [
-      25,
-      10,
-      2,
-      11,
-      1,
-      "BBOX"
     ],
     [
       26,
