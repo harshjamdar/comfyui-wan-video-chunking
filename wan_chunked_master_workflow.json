@@ -1,0 +1,70 @@
+{
+  "id": "wan-chunked-master-workflow",
+  "revision": 0,
+  "last_node_id": 1,
+  "last_link_id": 0,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "WanChunkedWorkflowRunner",
+      "pos": [
+        120,
+        120
+      ],
+      "size": [
+        520,
+        760
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "final_video_path",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanChunkedWorkflowRunner"
+      },
+      "widgets_values": [
+        "workflows/gemini_final_1_api.json",
+        "http://127.0.0.1:8188",
+        "input/test.mp4",
+        "output",
+        "output/wan22_chunked_final.mp4",
+        "the person is dancing, cinematic lighting, high quality",
+        "blurry, low quality, static, deformed, extra limbs",
+        30,
+        2.0,
+        480,
+        848,
+        10,
+        1.0,
+        963067643049281,
+        false,
+        "wan22_chunk",
+        false,
+        true,
+        2.0,
+        120,
+        0
+      ]
+    }
+  ],
+  "links": [],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1,
+      "offset": [
+        0,
+        0
+      ]
+    }
+  },
+  "version": 0.4
+}
