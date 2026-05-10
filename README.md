@@ -37,6 +37,19 @@ latent_chunk_frames: 16
 overlap_latent_frames: 0
 ```
 
+The sampler widget order is intentionally plain and stable:
+
+```text
+seed
+steps
+cfg
+sampler_name
+scheduler
+denoise
+latent_chunk_frames
+overlap_latent_frames
+```
+
 If the output has visible temporal cuts, try:
 
 ```text

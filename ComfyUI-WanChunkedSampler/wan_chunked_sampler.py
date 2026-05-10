@@ -15,7 +15,6 @@ class ChunkedWanKSampler:
                 "negative": ("CONDITIONING",),
                 "latent_image": ("LATENT",),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
-                "control_after_generate": (["fixed", "increment", "decrement", "randomize"],),
                 "steps": ("INT", {"default": 20, "min": 1, "max": 10000}),
                 "cfg": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0, "step": 0.1, "round": 0.01}),
                 "sampler_name": (comfy.samplers.KSampler.SAMPLERS,),
@@ -77,7 +76,6 @@ class ChunkedWanKSampler:
         negative,
         latent_image,
         seed,
-        control_after_generate,
         steps,
         cfg,
         sampler_name,
@@ -132,15 +130,9 @@ class ChunkedWanKSampler:
             end = min(total_frames, start + chunk_size)
             latent_chunk = self._slice_latent(latent_image, start, end)
 
-            chunk_seed = seed
-            if control_after_generate == "increment":
-                chunk_seed = seed + chunk_index
-            elif control_after_generate == "decrement":
-                chunk_seed = max(0, seed - chunk_index)
-
             result = self._run_ksampler(
                 model,
-                chunk_seed,
+                seed + chunk_index,
                 steps,
                 cfg,
                 sampler_name,
